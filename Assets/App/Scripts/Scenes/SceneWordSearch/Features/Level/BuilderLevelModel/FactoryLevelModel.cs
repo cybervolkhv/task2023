@@ -35,12 +35,13 @@ namespace App.Scripts.Scenes.SceneWordSearch.Features.Level.BuilderLevelModel
             charsList2 = words[1].ToList();
             charsList3 = words[2].ToList();
 
-            for (int i = 0; i < charsList2.Count; i++)
+            for (int i = 0; i < charsList2.Count; i++) //Find All extra lit
             {
                 if (charsList1.Contains(charsList2[i]))
                 {
                     charsList1.Remove(charsList2[i]);
                     charsList2.Remove(charsList2[i]);
+                    --i;
                 }
                 else
                 {
@@ -58,6 +59,7 @@ namespace App.Scripts.Scenes.SceneWordSearch.Features.Level.BuilderLevelModel
                 {
                     charsListTemp.Remove(charsList3[i]);
                     charsList3.Remove(charsList3[i]);
+                    --i;
                 }
                 else
                 {
