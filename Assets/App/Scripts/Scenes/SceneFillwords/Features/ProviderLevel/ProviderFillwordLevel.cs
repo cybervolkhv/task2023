@@ -14,6 +14,8 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
 
         public GridFillWords LoadModel(int index)
         {
+
+
             TextAsset textAsset = (TextAsset)Resources.Load("Fillwords/pack_0");
             _strings = textAsset.text.Split(new string[] { "\n" }, StringSplitOptions.None);
 
