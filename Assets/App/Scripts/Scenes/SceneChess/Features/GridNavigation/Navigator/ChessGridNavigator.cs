@@ -36,13 +36,13 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                     WaitingNodes.AddRange(GetNeighborsForPon(startNode));
                     break;
                 case ChessUnitType.Queen:
-                    WaitingNodes.AddRange(GetNeighborsForQueen(startNode));
+                    WaitingNodes.AddRange(GetNeighborsForQueen(startNode, grid));
                     break;
                 case ChessUnitType.Bishop:
-                    WaitingNodes.AddRange(GetNeighborsForBishop(startNode));
+                    WaitingNodes.AddRange(GetNeighborsForBishop(startNode, grid));
                     break;
                 case ChessUnitType.Rook:
-                    WaitingNodes.AddRange(GetNeighborsForRook(startNode, grid, WaitingNodes, CheckedNodes));
+                    WaitingNodes.AddRange(GetNeighborsForRook(startNode, grid));
                     //WaitingNodes.AddRange(GetNeighborsForRookTest(startNode, grid, ref WaitingNodes, ref CheckedNodes));
                     break;
             }
@@ -107,13 +107,13 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                                 WaitingNodes.AddRange(GetNeighborsForPon(nodeToCheck));
                                 break;
                             case ChessUnitType.Queen:
-                                WaitingNodes.AddRange(GetNeighborsForQueen(nodeToCheck));
+                                WaitingNodes.AddRange(GetNeighborsForQueen(nodeToCheck, grid));
                                 break;
                             case ChessUnitType.Bishop:
-                                WaitingNodes.AddRange(GetNeighborsForBishop(nodeToCheck));
+                                WaitingNodes.AddRange(GetNeighborsForBishop(nodeToCheck, grid));
                                 break;
                             case ChessUnitType.Rook:
-                               WaitingNodes.AddRange(GetNeighborsForRook(nodeToCheck, grid, WaitingNodes, CheckedNodes));
+                               WaitingNodes.AddRange(GetNeighborsForRook(nodeToCheck, grid));
                                 //WaitingNodes.AddRange(GetNeighborsForRookTest(nodeToCheck, grid, ref WaitingNodes, ref CheckedNodes));
                                 break;
                         }
@@ -318,7 +318,7 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             return neighbors;
         }
 
-        public List<Node> GetNeighborsForRook(Node node, ChessGrid grid,  List<Node> WaitingNodes,  List<Node> CheckedNodes)
+        public List<Node> GetNeighborsForRook(Node node, ChessGrid grid)
         {
             int verticalAndHorizontalMoveCostG = 10;
             List<Node> neighbors = new List<Node>();
@@ -332,9 +332,6 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
 
                     if (chessUnit != null)
                     {
-                        WaitingNodes.Remove(cheakNode);
-                        CheckedNodes.Add(cheakNode);
-                        Debug.Log(cheakNode.Position.x + "- x  " + cheakNode.Position.y + " - y " + "I see that plase");
                         break;
                     }
                     else
@@ -359,9 +356,6 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
 
                     if (chessUnit != null)
                     {
-                        WaitingNodes.Remove(cheakNode);
-                        CheckedNodes.Add(cheakNode);
-                        Debug.Log(cheakNode.Position.x + "- x " + cheakNode.Position.y + " - y " + "I see that plase");
                         break;
                     }
                     else
@@ -385,9 +379,6 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
 
                     if (chessUnit != null)
                     {
-                        WaitingNodes.Remove(cheakNode);
-                        CheckedNodes.Add(cheakNode);
-                        Debug.Log(cheakNode.Position.x + "- x  " + cheakNode.Position.y + " - y " + "I see that plase");
                         break;
                     }
                     else
@@ -405,32 +396,23 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             {
                 if (!(node.Position.y - i < 0))
                 {
-                    Node cheakNode = new Node(node.G + verticalAndHorizontalMoveCostG, new Vector2Int(node.Position.x, node.Position.y - i), node.TargetPosition, node);
-                    ChessUnit chessUnit = grid.Get(cheakNode.Position);
+                    Node checkNode = new Node(node.G + verticalAndHorizontalMoveCostG, new Vector2Int(node.Position.x, node.Position.y - i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(checkNode.Position);
 
                     if (chessUnit != null)
                     {
-                        WaitingNodes.Remove(cheakNode);
-                        CheckedNodes.Add(cheakNode);
-                        Debug.Log(cheakNode.Position.x + "- x  " + cheakNode.Position.y + " - y " + "I see that plase");
                         break;
                     }
                     else
                     {
-                        neighbors.Add(cheakNode);
+                        neighbors.Add(checkNode);
                     }
-
-                    //neighbors.Add(
-                    //   new Node(node.G + verticalAndHorizontalMoveCostG,
-                    //   new Vector2Int(node.Position.x, node.Position.y - i),
-                    //   node.TargetPosition,
-                    //   node));
                 }              
             }
             return neighbors;
         }
 
-        public List<Node> GetNeighborsForBishop(Node node)
+        public List<Node> GetNeighborsForBishop(Node node, ChessGrid grid)
         {
             int diagonalMoveCostG = 14;
             int chessBoardSize = 8;
@@ -440,11 +422,16 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             {
                 if (!((node.Position.x + i > 7) || (node.Position.y + i > 7)))
                 {
-                    neighbors.Add(
-                 new Node(node.G + diagonalMoveCostG,
-                 new Vector2Int(node.Position.x + i, node.Position.y + i),
-                 node.TargetPosition,
-                 node));
+                    Node checkNode = new Node(node.G + diagonalMoveCostG, new Vector2Int(node.Position.x + i, node.Position.y + i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(checkNode.Position);
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(checkNode);
+                    }                   
                 }
                   
             }
@@ -452,22 +439,34 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             {
                 if (!((node.Position.x - i < 0) || (node.Position.y - i < 0)))
                 {
-                    neighbors.Add(
-                 new Node(node.G + diagonalMoveCostG,
-                 new Vector2Int(node.Position.x - i, node.Position.y - i),
-                 node.TargetPosition,
-                 node));
+                    Node checkNode = new Node(node.G + diagonalMoveCostG, new Vector2Int(node.Position.x - i, node.Position.y - i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(checkNode.Position);
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(checkNode);
+                    }
                 }              
             }
             for (int i = 1; i < chessBoardSize; i++)
             {
                 if (!((node.Position.x - i < 0) || (node.Position.y + i > 7)))
                 {
-                    neighbors.Add(
-                       new Node(node.G + diagonalMoveCostG,
-                       new Vector2Int(node.Position.x - i, node.Position.y + i),
-                       node.TargetPosition,
-                       node));
+
+                    Node checkNode = new Node(node.G + diagonalMoveCostG, new Vector2Int(node.Position.x - i, node.Position.y + i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(checkNode.Position);
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(checkNode);
+                    }
+                  
                 }
 
             }
@@ -475,17 +474,22 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             {
                 if (!((node.Position.x + i > 7) || (node.Position.y - i < 0)))
                 {
-                    neighbors.Add(
-                 new Node(node.G + diagonalMoveCostG,
-                 new Vector2Int(node.Position.x + i, node.Position.y - i),
-                 node.TargetPosition,
-                 node));
+                    Node checkNode = new Node(node.G + diagonalMoveCostG, new Vector2Int(node.Position.x + i, node.Position.y - i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(checkNode.Position);
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(checkNode);
+                    }
                 }           
             }
             return neighbors;
         }
 
-        public List<Node> GetNeighborsForQueen(Node node)
+        public List<Node> GetNeighborsForQueen(Node node, ChessGrid grid)
         {
             int verticalAndHorizontalMoveCostG = 10;
             int diagonalMoveCostG = 14;
@@ -496,98 +500,133 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             {
                 if (!(node.Position.x + i > 7))
                 {
-                    neighbors.Add(
-              new Node(node.G + verticalAndHorizontalMoveCostG,
-              new Vector2Int(node.Position.x + i, node.Position.y),
-              node.TargetPosition,
-              node));
-                }
-               
+                    Node cheakNode = new Node(node.G + verticalAndHorizontalMoveCostG, new Vector2Int(node.Position.x + i, node.Position.y), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(cheakNode.Position);
+
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(cheakNode);
+                    }
+                }               
             }
             for (int i = 1; i < chessBoardSize; i++)
             {
                 if (!(node.Position.x - i < 0))
                 {
-                    neighbors.Add(
-                 new Node(node.G + verticalAndHorizontalMoveCostG,
-                 new Vector2Int(node.Position.x - i, node.Position.y),
-                 node.TargetPosition,
-                 node));
+                    Node cheakNode = new Node(node.G + verticalAndHorizontalMoveCostG, new Vector2Int(node.Position.x - i, node.Position.y), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(cheakNode.Position);
+
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(cheakNode);
+                    }
                 }
-            }
-                  
+            }                  
             for (int i = 1; i < chessBoardSize; i++)
             {
                 if (!(node.Position.y + i > 7))
                 {
-                    neighbors.Add(
-                new Node(node.G + verticalAndHorizontalMoveCostG,
-                new Vector2Int(node.Position.x, node.Position.y + i),
-                node.TargetPosition,
-                node));
+                    Node cheakNode = new Node(node.G + verticalAndHorizontalMoveCostG, new Vector2Int(node.Position.x, node.Position.y + i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(cheakNode.Position);
+
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(cheakNode);
+                    }
                 }
-            }
-                 
+            }                 
             for (int i = 1; i < chessBoardSize; i++)
             {
                 if (!(node.Position.y - i < 0))
                 {
-                    neighbors.Add(
-                 new Node(node.G + verticalAndHorizontalMoveCostG,
-                 new Vector2Int(node.Position.x, node.Position.y - i),
-                 node.TargetPosition,
-                 node));
-                }
-                  
+                    Node checkNode = new Node(node.G + verticalAndHorizontalMoveCostG, new Vector2Int(node.Position.x, node.Position.y - i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(checkNode.Position);
+
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(checkNode);
+                    }
+                }                  
             }
             for (int i = 1; i < chessBoardSize; i++)
             {
-
                 if (!((node.Position.x + i > 7) || (node.Position.y + i > 7)))
                 {
-                    neighbors.Add(
-                   new Node(node.G + diagonalMoveCostG,
-                   new Vector2Int(node.Position.x + i, node.Position.y + i),
-                   node.TargetPosition,
-                   node));
-                }
-                  
+                    Node checkNode = new Node(node.G + diagonalMoveCostG, new Vector2Int(node.Position.x + i, node.Position.y + i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(checkNode.Position);
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(checkNode);
+                    }
+                }                  
             }
             for (int i = 1; i < chessBoardSize; i++)
             {
                 if (!((node.Position.x - i < 0) || (node.Position.y - i < 0)))
                 {
-                    neighbors.Add(
-                   new Node(node.G + diagonalMoveCostG,
-                   new Vector2Int(node.Position.x - i, node.Position.y - i),
-                   node.TargetPosition,
-                   node));
+                    Node checkNode = new Node(node.G + diagonalMoveCostG, new Vector2Int(node.Position.x - i, node.Position.y - i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(checkNode.Position);
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(checkNode);
+                    }
                 }
             }
             for (int i = 1; i < chessBoardSize; i++)
             {
                 if (!((node.Position.x - i < 0) || (node.Position.y + i > 7)))
                 {
-                    neighbors.Add(
-                   new Node(node.G + diagonalMoveCostG,
-                   new Vector2Int(node.Position.x - i, node.Position.y + i),
-                   node.TargetPosition,
-                   node));
-                }
-                  
+                    Node checkNode = new Node(node.G + diagonalMoveCostG, new Vector2Int(node.Position.x - i, node.Position.y + i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(checkNode.Position);
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(checkNode);
+                    }
+                }                  
             }
             for (int i = 1; i < chessBoardSize; i++)
             {
-
                 if (!((node.Position.x + i > 7) || (node.Position.y - i < 0)))
                 {
-                    neighbors.Add(
-                   new Node(node.G + diagonalMoveCostG,
-                   new Vector2Int(node.Position.x + i, node.Position.y - i),
-                   node.TargetPosition,
-                   node));
-                }
-                  
+                    Node checkNode = new Node(node.G + diagonalMoveCostG, new Vector2Int(node.Position.x + i, node.Position.y - i), node.TargetPosition, node);
+                    ChessUnit chessUnit = grid.Get(checkNode.Position);
+                    if (chessUnit != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        neighbors.Add(checkNode);
+                    }
+                }                  
             }
             return neighbors;
         }
