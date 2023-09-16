@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using App.Scripts.Scenes.SceneChess.Features.ChessField.GridMatrix;
 using App.Scripts.Scenes.SceneChess.Features.ChessField.Types;
@@ -43,7 +42,6 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                     break;
                 case ChessUnitType.Rook:
                     WaitingNodes.AddRange(GetNeighborsForRook(startNode, grid));
-                    //WaitingNodes.AddRange(GetNeighborsForRookTest(startNode, grid, ref WaitingNodes, ref CheckedNodes));
                     break;
             }
 
@@ -65,14 +63,9 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                 {
                     return CalculatePathFromNode(nodeToCheck);
                 }
-                //Debug.Log(nodeToCheck.Position.x + " " + nodeToCheck.Position.y);
 
                 ChessUnit chessUnit = grid.Get(nodeToCheck.Position);
-                //Debug.Log(chessUnit);
                 bool walkable = chessUnit == null;
-                //bool walkable = chessUnit.IsAvailable;
-                //grid.RemoveAt(nodeToCheck.Position);
-               // bool walkable = true;
 
                 if (!walkable)
                 {
@@ -114,24 +107,14 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                                 break;
                             case ChessUnitType.Rook:
                                WaitingNodes.AddRange(GetNeighborsForRook(nodeToCheck, grid));
-                                //WaitingNodes.AddRange(GetNeighborsForRookTest(nodeToCheck, grid, ref WaitingNodes, ref CheckedNodes));
                                 break;
                         }
                     }
-                    //else
-                    //{
-                    //    var sameNode = CheckedNodes.Where(x => x.Position == nodeToCheck.Position).ToList();
-                    //    for (int i = 0; i < sameNode.Count; i++)
-                    //    {
-                    //        if (sameNode[i].F > nodeToCheck.F)
-                    //    }
-                    //}
                 }
 
             }
 
-
-             return PathToTarget;
+             return null;
             //напиши реализацию не меняя сигнатуру функции
             //throw new NotImplementedException();
         }
@@ -631,121 +614,6 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             return neighbors;
         }
 
-        public List<Node> GetNeighborsForRookTest(Node node, ChessGrid grid, ref List<Node> WaitingNodes, ref List<Node> CheckedNodes)
-        {
-            int verticalAndHorizontalMoveCostG = 10;
-            List<Node> neighbors = new List<Node>();
-            int chessBoardSize = 8;
-            bool CanMoveRight = true;
-            for (int i = 1; i < chessBoardSize; i++)
-            {       
-                if (!(node.Position.x + i > 7) )
-                {
-
-                    ChessUnit chessUnit = grid.Get(node.Position.x + i, node.Position.y);
-                    if (chessUnit == null && CanMoveRight)
-                    {
-                        neighbors.Add(
-                          new Node(node.G + verticalAndHorizontalMoveCostG,
-                           new Vector2Int(node.Position.x + i, node.Position.y),
-                           node.TargetPosition,
-                           node));
-                    }
-                    else
-                    {
-                        CheckedNodes.Add(
-                         new Node(node.G + verticalAndHorizontalMoveCostG,
-                          new Vector2Int(node.Position.x + i, node.Position.y),
-                          node.TargetPosition,
-                          node));
-                        CanMoveRight = false;
-                    }                                  
-                }
-            }
-            bool CanMoveLeft = true;
-            for (int i = 1; i < chessBoardSize; i++)
-            {                
-                if (!(node.Position.x - i < 0))
-                {
-                    ChessUnit chessUnit = grid.Get(node.Position.x - i, node.Position.y);
-                    if (chessUnit == null && CanMoveLeft)
-                    {
-                        neighbors.Add(
-                           new Node(node.G + verticalAndHorizontalMoveCostG,
-                           new Vector2Int(node.Position.x - i, node.Position.y),
-                           node.TargetPosition,
-                           node));
-                    
-                    }
-                    else
-                    {
-                        CheckedNodes.Add(
-                        new Node(node.G + verticalAndHorizontalMoveCostG,
-                        new Vector2Int(node.Position.x - i, node.Position.y),
-                        node.TargetPosition,
-                        node));
-                        CanMoveLeft = false;
-                        Debug.Log("Look left, see " + chessUnit.CellPosition.x + " " + chessUnit.CellPosition.y);
-                    }             
-
-                }
-            }
-            bool CanMoveUp = true;
-            for (int i = 1; i < chessBoardSize; i++)
-            {
-               
-                if (!(node.Position.y + i > 7))
-                {
-                    ChessUnit chessUnit = grid.Get(node.Position.x, node.Position.y + i);
-                    if (chessUnit == null && CanMoveUp)
-                    {
-                        neighbors.Add(
-                          new Node(node.G + verticalAndHorizontalMoveCostG,
-                          new Vector2Int(node.Position.x, node.Position.y + i),
-                          node.TargetPosition,
-                          node));
-                    }
-                    else
-                    {
-                        CheckedNodes.Add(
-                                                  new Node(node.G + verticalAndHorizontalMoveCostG,
-                                                  new Vector2Int(node.Position.x, node.Position.y + i),
-                                                  node.TargetPosition,
-                                                  node));
-
-                        CanMoveUp = false;
-                    }                     
-                }
-            }
-            bool CanMoveDown = true;
-            for (int i = 1; i < chessBoardSize; i++)
-            {
-              
-                if (!(node.Position.y - i < 0))
-                {
-                    ChessUnit chessUnit = grid.Get(node.Position.x, node.Position.y - i);
-                    if (chessUnit == null && CanMoveDown)
-                    {
-                        neighbors.Add(
-                        new Node(node.G + verticalAndHorizontalMoveCostG,
-                        new Vector2Int(node.Position.x, node.Position.y - i),
-                        node.TargetPosition,
-                        node));
-                    }
-                    else
-                    {
-                        CheckedNodes.Add(
-                     new Node(node.G + verticalAndHorizontalMoveCostG,
-                     new Vector2Int(node.Position.x, node.Position.y - i),
-                     node.TargetPosition,
-                     node));
-                        CanMoveDown = false;
-                    }                     
-                    
-                }
-            }
-            return neighbors;
-        }
 
     }
 
