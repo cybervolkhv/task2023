@@ -61,9 +61,11 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                 {
                     return CalculatePathFromNode(nodeToCheck);
                 }
+                Debug.Log(nodeToCheck.Position.x + " " + nodeToCheck.Position.y);
 
-                //ChessUnit chessUnit = grid.Get(nodeToCheck.Position);
-                // bool walkable = chessUnit.IsAvailable;
+                // ChessUnit chessUnit = grid.Get(nodeToCheck.Position);
+                //bool walkable = chessUnit.IsAvailable;
+                //grid.RemoveAt(nodeToCheck.Position);
                 bool walkable = true;
 
                 if (!walkable)
@@ -74,7 +76,17 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                 else if (walkable)
                 {
                     WaitingNodes.Remove(nodeToCheck);
-                    if (!CheckedNodes.Where(x => x.Position == nodeToCheck.Position).Any())
+
+                    bool isContains = false;
+                    foreach (Node node in CheckedNodes)
+                    {
+                        if (node.Position == nodeToCheck.Position)
+                        {
+                            isContains = true;
+                        }
+                    }
+
+                    if (!isContains)        //((!CheckedNodes.Where(x => x.Position == nodeToCheck.Position).Any())) // если нету то добавь(!CheckedNodes.Contains(nodeToCheck)) 
                     {
                         CheckedNodes.Add(nodeToCheck);
                         switch (unit)
@@ -135,47 +147,70 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             int verticalAndHorizontalMoveCostG = 10;
             int diagonalMoveCostG = 14;
             List<Node> neighbors = new List<Node>();
-            neighbors.Add(
-               new Node(node.G + verticalAndHorizontalMoveCostG,
-               new Vector2Int(node.Position.x - 1, node.Position.y),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + verticalAndHorizontalMoveCostG,
-               new Vector2Int(node.Position.x + 1, node.Position.y),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + verticalAndHorizontalMoveCostG,
-               new Vector2Int(node.Position.x, node.Position.y - 1),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + verticalAndHorizontalMoveCostG,
-               new Vector2Int(node.Position.x, node.Position.y + 1),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + diagonalMoveCostG,
-               new Vector2Int(node.Position.x + 1, node.Position.y + 1),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + diagonalMoveCostG,
-               new Vector2Int(node.Position.x - 1, node.Position.y - 1),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + diagonalMoveCostG,
-               new Vector2Int(node.Position.x + 1, node.Position.y - 1),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + diagonalMoveCostG,
-               new Vector2Int(node.Position.x - 1, node.Position.y + 1),
-               node.TargetPosition,
-               node));
-
+            if (!(node.Position.x - 1 < 0))
+            {
+                neighbors.Add(
+                   new Node(node.G + verticalAndHorizontalMoveCostG,
+                   new Vector2Int(node.Position.x - 1, node.Position.y),
+                   node.TargetPosition,
+                   node));     
+            }
+            if (!(node.Position.x + 1 > 7))
+            {
+                neighbors.Add(
+                   new Node(node.G + verticalAndHorizontalMoveCostG,
+                   new Vector2Int(node.Position.x + 1, node.Position.y),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!(node.Position.y - 1 < 0))
+            {
+                neighbors.Add(
+                   new Node(node.G + verticalAndHorizontalMoveCostG,
+                   new Vector2Int(node.Position.x, node.Position.y - 1),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!(node.Position.y + 1 > 7))
+            {
+                neighbors.Add(
+                   new Node(node.G + verticalAndHorizontalMoveCostG,
+                   new Vector2Int(node.Position.x, node.Position.y + 1),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!((node.Position.x + 1 > 7) || (node.Position.y + 1 > 7)))
+            {
+                neighbors.Add(
+                   new Node(node.G + diagonalMoveCostG,
+                   new Vector2Int(node.Position.x + 1, node.Position.y + 1),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!((node.Position.x - 1 < 0) || (node.Position.y - 1 < 0)))
+            {
+                neighbors.Add(
+                   new Node(node.G + diagonalMoveCostG,
+                   new Vector2Int(node.Position.x - 1, node.Position.y - 1),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!((node.Position.x + 1 > 7) || (node.Position.y - 1 < 0)))
+            {
+                neighbors.Add(
+                   new Node(node.G + diagonalMoveCostG,
+                   new Vector2Int(node.Position.x + 1, node.Position.y - 1),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!((node.Position.x - 1 < 0) || (node.Position.y + 1 > 7)))
+            {
+                neighbors.Add(
+                   new Node(node.G + diagonalMoveCostG,
+                   new Vector2Int(node.Position.x - 1, node.Position.y + 1),
+                   node.TargetPosition,
+                   node));
+            }   
             return neighbors;
         }
 
@@ -183,12 +218,14 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
         {
             int verticalMoveCostG = 10;
             List<Node> neighbors = new List<Node>();
-            neighbors.Add(
-               new Node(node.G + verticalMoveCostG,
-               new Vector2Int(node.Position.x, node.Position.y - 1),
-               node.TargetPosition,
-               node));
-
+            if (!(node.Position.y - 1 < 0))
+            {
+                neighbors.Add(
+                   new Node(node.G + verticalMoveCostG,
+                   new Vector2Int(node.Position.x, node.Position.y - 1),
+                   node.TargetPosition,
+                   node));
+            }
             return neighbors;
         }
 
@@ -196,47 +233,72 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
         {
             int knightMoveCostG = 32;
             List<Node> neighbors = new List<Node>();
-            neighbors.Add(
-               new Node(node.G + knightMoveCostG,
-               new Vector2Int(node.Position.x + 1, node.Position.y + 2),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + knightMoveCostG,
-               new Vector2Int(node.Position.x + 2, node.Position.y + 1),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + knightMoveCostG,
-               new Vector2Int(node.Position.x + 2, node.Position.y - 1),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + knightMoveCostG,
-               new Vector2Int(node.Position.x + 1, node.Position.y - 2),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + knightMoveCostG,
-               new Vector2Int(node.Position.x - 1, node.Position.y - 2),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + knightMoveCostG,
-               new Vector2Int(node.Position.x - 2, node.Position.y - 1),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + knightMoveCostG,
-               new Vector2Int(node.Position.x - 2, node.Position.y + 1),
-               node.TargetPosition,
-               node));
-            neighbors.Add(
-               new Node(node.G + knightMoveCostG,
-               new Vector2Int(node.Position.x - 1, node.Position.y + 2),
-               node.TargetPosition,
-               node));
+            if (!((node.Position.x + 1 > 7) || (node.Position.y + 2 > 7)))
+            {
+                neighbors.Add(
+                   new Node(node.G + knightMoveCostG,
+                   new Vector2Int(node.Position.x + 1, node.Position.y + 2),
+                   node.TargetPosition,
+                   node));
+            }
 
+            if (!((node.Position.x + 2 > 7) || (node.Position.y + 1 > 7)))
+            {
+                neighbors.Add(
+                   new Node(node.G + knightMoveCostG,
+                   new Vector2Int(node.Position.x + 2, node.Position.y + 1),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!((node.Position.x + 2 > 7) || (node.Position.y - 1 < 0)))
+            {
+                neighbors.Add(
+                   new Node(node.G + knightMoveCostG,
+                   new Vector2Int(node.Position.x + 2, node.Position.y - 1),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!((node.Position.x + 1 > 7) || (node.Position.y - 2 < 0)))
+            {
+                neighbors.Add(
+                   new Node(node.G + knightMoveCostG,
+                   new Vector2Int(node.Position.x + 1, node.Position.y - 2),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!((node.Position.x - 1 < 0) || (node.Position.y - 2 < 0)))
+            {
+                neighbors.Add(
+                   new Node(node.G + knightMoveCostG,
+                   new Vector2Int(node.Position.x - 1, node.Position.y - 2),
+                   node.TargetPosition,
+                   node));
+            }
+
+            if (!((node.Position.x - 2 < 0) || (node.Position.y - 1 < 0)))
+            {
+                neighbors.Add(
+                   new Node(node.G + knightMoveCostG,
+                   new Vector2Int(node.Position.x - 2, node.Position.y - 1),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!((node.Position.x - 2 < 0) || (node.Position.y + 1 > 7)))
+            {
+                neighbors.Add(
+                   new Node(node.G + knightMoveCostG,
+                   new Vector2Int(node.Position.x - 2, node.Position.y + 1),
+                   node.TargetPosition,
+                   node));
+            }
+            if (!((node.Position.x - 1 < 0) || (node.Position.y + 2 > 7)))
+            {
+                neighbors.Add(
+                   new Node(node.G + knightMoveCostG,
+                   new Vector2Int(node.Position.x - 1, node.Position.y + 2),
+                   node.TargetPosition,
+                   node));
+            }
             return neighbors;
         }
 
@@ -245,37 +307,49 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             int verticalAndHorizontalMoveCostG = 10;
             List<Node> neighbors = new List<Node>();
             int chessBoardSize = 8;
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + verticalAndHorizontalMoveCostG,
-                   new Vector2Int(node.Position.x + i, node.Position.y),
-                   node.TargetPosition,
-                   node));
+                if (!(node.Position.x + i > 7))
+                {
+                    neighbors.Add(
+                       new Node(node.G + verticalAndHorizontalMoveCostG,
+                       new Vector2Int(node.Position.x + i, node.Position.y),
+                       node.TargetPosition,
+                       node));
+                }                  
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + verticalAndHorizontalMoveCostG,
-                   new Vector2Int(node.Position.x - i, node.Position.y),
-                   node.TargetPosition,
-                   node));
+                if (!(node.Position.x - i < 0))
+                {
+                    neighbors.Add(
+                       new Node(node.G + verticalAndHorizontalMoveCostG,
+                       new Vector2Int(node.Position.x - i, node.Position.y),
+                       node.TargetPosition,
+                       node));
+                }                
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + verticalAndHorizontalMoveCostG,
-                   new Vector2Int(node.Position.x, node.Position.y + i),
-                   node.TargetPosition,
-                   node));
+                if (!(node.Position.y + i > 7))
+                {
+                    neighbors.Add(
+                       new Node(node.G + verticalAndHorizontalMoveCostG,
+                       new Vector2Int(node.Position.x, node.Position.y + i),
+                       node.TargetPosition,
+                       node));
+                }               
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + verticalAndHorizontalMoveCostG,
-                   new Vector2Int(node.Position.x, node.Position.y - i),
-                   node.TargetPosition,
-                   node));
+                if (!(node.Position.y - i < 0))
+                {
+                    neighbors.Add(
+                       new Node(node.G + verticalAndHorizontalMoveCostG,
+                       new Vector2Int(node.Position.x, node.Position.y - i),
+                       node.TargetPosition,
+                       node));
+                }              
             }
             return neighbors;
         }
@@ -286,37 +360,51 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             int chessBoardSize = 8;
             List<Node> neighbors = new List<Node>();
 
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + diagonalMoveCostG,
-                   new Vector2Int(node.Position.x + i, node.Position.y + i),
-                   node.TargetPosition,
-                   node));
+                if (!((node.Position.x + i > 7) || (node.Position.y + i > 7)))
+                {
+                    neighbors.Add(
+                 new Node(node.G + diagonalMoveCostG,
+                 new Vector2Int(node.Position.x + i, node.Position.y + i),
+                 node.TargetPosition,
+                 node));
+                }
+                  
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + diagonalMoveCostG,
-                   new Vector2Int(node.Position.x - i, node.Position.y - i),
-                   node.TargetPosition,
-                   node));
+                if (!((node.Position.x - i < 0) || (node.Position.y - i < 0)))
+                {
+                    neighbors.Add(
+                 new Node(node.G + diagonalMoveCostG,
+                 new Vector2Int(node.Position.x - i, node.Position.y - i),
+                 node.TargetPosition,
+                 node));
+                }              
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + diagonalMoveCostG,
-                   new Vector2Int(node.Position.x - i, node.Position.y + i),
-                   node.TargetPosition,
-                   node));
+                if (!((node.Position.x - i < 0) || (node.Position.y + i > 7)))
+                {
+                    neighbors.Add(
+                       new Node(node.G + diagonalMoveCostG,
+                       new Vector2Int(node.Position.x - i, node.Position.y + i),
+                       node.TargetPosition,
+                       node));
+                }
+
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + diagonalMoveCostG,
-                   new Vector2Int(node.Position.x + i, node.Position.y - i),
-                   node.TargetPosition,
-                   node));
+                if (!((node.Position.x + i > 7) || (node.Position.y - i < 0)))
+                {
+                    neighbors.Add(
+                 new Node(node.G + diagonalMoveCostG,
+                 new Vector2Int(node.Position.x + i, node.Position.y - i),
+                 node.TargetPosition,
+                 node));
+                }           
             }
             return neighbors;
         }
@@ -328,69 +416,102 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             int chessBoardSize = 8;
             List<Node> neighbors = new List<Node>();
 
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + verticalAndHorizontalMoveCostG,
-                   new Vector2Int(node.Position.x + i, node.Position.y),
-                   node.TargetPosition,
-                   node));
+                if (!(node.Position.x + i > 7))
+                {
+                    neighbors.Add(
+              new Node(node.G + verticalAndHorizontalMoveCostG,
+              new Vector2Int(node.Position.x + i, node.Position.y),
+              node.TargetPosition,
+              node));
+                }
+               
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + verticalAndHorizontalMoveCostG,
-                   new Vector2Int(node.Position.x - i, node.Position.y),
-                   node.TargetPosition,
-                   node));
+                if (!(node.Position.x - i < 0))
+                {
+                    neighbors.Add(
+                 new Node(node.G + verticalAndHorizontalMoveCostG,
+                 new Vector2Int(node.Position.x - i, node.Position.y),
+                 node.TargetPosition,
+                 node));
+                }
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+                  
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + verticalAndHorizontalMoveCostG,
-                   new Vector2Int(node.Position.x, node.Position.y + i),
-                   node.TargetPosition,
-                   node));
+                if (!(node.Position.y + i > 7))
+                {
+                    neighbors.Add(
+                new Node(node.G + verticalAndHorizontalMoveCostG,
+                new Vector2Int(node.Position.x, node.Position.y + i),
+                node.TargetPosition,
+                node));
+                }
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+                 
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
-                   new Node(node.G + verticalAndHorizontalMoveCostG,
-                   new Vector2Int(node.Position.x, node.Position.y - i),
-                   node.TargetPosition,
-                   node));
+                if (!(node.Position.y - i < 0))
+                {
+                    neighbors.Add(
+                 new Node(node.G + verticalAndHorizontalMoveCostG,
+                 new Vector2Int(node.Position.x, node.Position.y - i),
+                 node.TargetPosition,
+                 node));
+                }
+                  
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
+
+                if (!((node.Position.x + i > 7) || (node.Position.y + i > 7)))
+                {
+                    neighbors.Add(
                    new Node(node.G + diagonalMoveCostG,
                    new Vector2Int(node.Position.x + i, node.Position.y + i),
                    node.TargetPosition,
                    node));
+                }
+                  
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
+                if (!((node.Position.x - i < 0) || (node.Position.y - i < 0)))
+                {
+                    neighbors.Add(
                    new Node(node.G + diagonalMoveCostG,
                    new Vector2Int(node.Position.x - i, node.Position.y - i),
                    node.TargetPosition,
                    node));
+                }
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
+                if (!((node.Position.x - i < 0) || (node.Position.y + i > 7)))
+                {
+                    neighbors.Add(
                    new Node(node.G + diagonalMoveCostG,
                    new Vector2Int(node.Position.x - i, node.Position.y + i),
                    node.TargetPosition,
                    node));
+                }
+                  
             }
-            for (int i = 1; i <= chessBoardSize; i++)
+            for (int i = 1; i < chessBoardSize; i++)
             {
-                neighbors.Add(
+
+                if (!((node.Position.x + i > 7) || (node.Position.y - i < 0)))
+                {
+                    neighbors.Add(
                    new Node(node.G + diagonalMoveCostG,
                    new Vector2Int(node.Position.x + i, node.Position.y - i),
                    node.TargetPosition,
                    node));
+                }
+                  
             }
             return neighbors;
         }
