@@ -42,8 +42,8 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                     WaitingNodes.AddRange(GetNeighborsForBishop(startNode));
                     break;
                 case ChessUnitType.Rook:
-                   // WaitingNodes.AddRange(GetNeighborsForRook(startNode, grid, WaitingNodes, CheckedNodes));
-                    WaitingNodes.AddRange(GetNeighborsForRookTest(startNode, grid, ref WaitingNodes, ref CheckedNodes));
+                    WaitingNodes.AddRange(GetNeighborsForRook(startNode, grid, WaitingNodes, CheckedNodes));
+                    //WaitingNodes.AddRange(GetNeighborsForRookTest(startNode, grid, ref WaitingNodes, ref CheckedNodes));
                     break;
             }
 
@@ -113,8 +113,8 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                                 WaitingNodes.AddRange(GetNeighborsForBishop(nodeToCheck));
                                 break;
                             case ChessUnitType.Rook:
-                               // WaitingNodes.AddRange(GetNeighborsForRook(nodeToCheck, grid, WaitingNodes, CheckedNodes));
-                                WaitingNodes.AddRange(GetNeighborsForRookTest(nodeToCheck, grid, ref WaitingNodes, ref CheckedNodes));
+                               WaitingNodes.AddRange(GetNeighborsForRook(nodeToCheck, grid, WaitingNodes, CheckedNodes));
+                                //WaitingNodes.AddRange(GetNeighborsForRookTest(nodeToCheck, grid, ref WaitingNodes, ref CheckedNodes));
                                 break;
                         }
                     }
@@ -318,7 +318,7 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             return neighbors;
         }
 
-        public List<Node> GetNeighborsForRook(Node node, ChessGrid grid, ref List<Node> WaitingNodes, ref List<Node> CheckedNodes)
+        public List<Node> GetNeighborsForRook(Node node, ChessGrid grid,  List<Node> WaitingNodes,  List<Node> CheckedNodes)
         {
             int verticalAndHorizontalMoveCostG = 10;
             List<Node> neighbors = new List<Node>();
@@ -328,14 +328,14 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                 if (!(node.Position.x + i > 7))
                 {
                     Node cheakNode = new Node(node.G + verticalAndHorizontalMoveCostG, new Vector2Int(node.Position.x + i, node.Position.y), node.TargetPosition, node);
-                    ChessUnit chessUnit = grid.Get(cheakNode.Position.x, node.Position.y);
+                    ChessUnit chessUnit = grid.Get(cheakNode.Position);
 
                     if (chessUnit != null)
                     {
                         WaitingNodes.Remove(cheakNode);
                         CheckedNodes.Add(cheakNode);
                         Debug.Log(cheakNode.Position.x + "- x  " + cheakNode.Position.y + " - y " + "I see that plase");
-                        continue;
+                        break;
                     }
                     else
                     {
@@ -355,14 +355,14 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                 {
 
                     Node cheakNode = new Node(node.G + verticalAndHorizontalMoveCostG, new Vector2Int(node.Position.x - i, node.Position.y), node.TargetPosition, node);
-                    ChessUnit chessUnit = grid.Get(cheakNode.Position.x, node.Position.y);
+                    ChessUnit chessUnit = grid.Get(cheakNode.Position);
 
                     if (chessUnit != null)
                     {
                         WaitingNodes.Remove(cheakNode);
                         CheckedNodes.Add(cheakNode);
-                        Debug.Log(cheakNode.Position.x + "- x" + cheakNode.Position.y + " - y " + "I see that plase");
-                        
+                        Debug.Log(cheakNode.Position.x + "- x " + cheakNode.Position.y + " - y " + "I see that plase");
+                        break;
                     }
                     else
                     {
@@ -381,14 +381,14 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                 if (!(node.Position.y + i > 7))
                 {
                     Node cheakNode = new Node(node.G + verticalAndHorizontalMoveCostG, new Vector2Int(node.Position.x, node.Position.y + i), node.TargetPosition, node);
-                    ChessUnit chessUnit = grid.Get(cheakNode.Position.x, node.Position.y);
+                    ChessUnit chessUnit = grid.Get(cheakNode.Position);
 
                     if (chessUnit != null)
                     {
                         WaitingNodes.Remove(cheakNode);
                         CheckedNodes.Add(cheakNode);
-                        Debug.Log(cheakNode.Position.x + "- x" + cheakNode.Position.y + " - y " + "I see that plase");
-                        continue;
+                        Debug.Log(cheakNode.Position.x + "- x  " + cheakNode.Position.y + " - y " + "I see that plase");
+                        break;
                     }
                     else
                     {
@@ -406,14 +406,14 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                 if (!(node.Position.y - i < 0))
                 {
                     Node cheakNode = new Node(node.G + verticalAndHorizontalMoveCostG, new Vector2Int(node.Position.x, node.Position.y - i), node.TargetPosition, node);
-                    ChessUnit chessUnit = grid.Get(cheakNode.Position.x, node.Position.y);
+                    ChessUnit chessUnit = grid.Get(cheakNode.Position);
 
                     if (chessUnit != null)
                     {
                         WaitingNodes.Remove(cheakNode);
                         CheckedNodes.Add(cheakNode);
-                        Debug.Log(cheakNode.Position.x + "- x" + cheakNode.Position.y + " - y " + "I see that plase");
-                        continue;
+                        Debug.Log(cheakNode.Position.x + "- x  " + cheakNode.Position.y + " - y " + "I see that plase");
+                        break;
                     }
                     else
                     {
@@ -602,6 +602,7 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             {       
                 if (!(node.Position.x + i > 7) )
                 {
+
                     ChessUnit chessUnit = grid.Get(node.Position.x + i, node.Position.y);
                     if (chessUnit == null && CanMoveRight)
                     {
