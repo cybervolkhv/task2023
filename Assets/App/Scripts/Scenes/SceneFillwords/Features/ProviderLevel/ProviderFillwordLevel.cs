@@ -12,11 +12,11 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
     {
         public GridFillWords LoadModel(int index)
         {
-            TextAsset textAsset = (TextAsset)Resources.Load("Fillwords/pack_0");
-            string[] packs = textAsset.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+            TextAsset textAssetPacks = (TextAsset)Resources.Load("Fillwords/pack_0");
+            string[] packs = textAssetPacks.text.Split(new string[] { "\n" }, StringSplitOptions.None);
 
-            TextAsset textAsset2 = (TextAsset)Resources.Load("Fillwords/words_list");
-            string[] wordsList = textAsset2.text.Split(new string[] { "\n" }, StringSplitOptions.None);
+            TextAsset textAssetwordsList = (TextAsset)Resources.Load("Fillwords/words_list");
+            string[] wordsList = textAssetwordsList.text.Split(new string[] { "\n" }, StringSplitOptions.None);
 
 
             int[] levelPack = LoadLevel(index, packs);
@@ -70,8 +70,8 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
             {
                 for (int j = 0; j < size.x; j++)
                 {
-                    int levelInsex = Array.IndexOf(levelPack, k);
-                    CharGridModel charGridModel = new CharGridModel(lettersOfIndexWord[levelInsex]);
+                    int levelIndex = Array.IndexOf(levelPack, k);
+                    CharGridModel charGridModel = new CharGridModel(lettersOfIndexWord[levelIndex]);
                     k++;
                     gridFillWords.Set(i, j, charGridModel);
                 }
@@ -89,8 +89,8 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
             if (packs[index].Length <= 10)
             {
                 packs[index] = packs[index].Replace(";", "").Remove(0, 2);
-                char[] paksCharArrey = packs[index].TrimEnd().ToArray();
-                int[] levelPack = CharsInInts(paksCharArrey);
+                char[] packCharArrey = packs[index].TrimEnd().ToArray();
+                int[] levelPack = CharsToInts(packCharArrey);
                 return levelPack;
             }
             else if (packs[index].Length > 10 && packs[index].Length <= 27)
@@ -109,8 +109,8 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
                         stringBuilder.Append(splitStrigs[i]);
                     }
                 }
-                char[] paksCharArrey = stringBuilder.ToString().TrimEnd().ToArray();
-                int[] levelPack = CharsInInts(paksCharArrey);
+                char[] packCharArrey = stringBuilder.ToString().TrimEnd().ToArray();
+                int[] levelPack = CharsToInts(packCharArrey);
                 return levelPack;
             }
             else
@@ -120,12 +120,12 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
             }
         }
 
-        public int[] CharsInInts(char[] paksCharArrey)
+        public int[] CharsToInts(char[] packCharArrey)
         {
-            int[] levelPack = new int[paksCharArrey.Length];
-            for (int i = 0; i < paksCharArrey.Length; i++)
+            int[] levelPack = new int[packCharArrey.Length];
+            for (int i = 0; i < packCharArrey.Length; i++)
             {
-                levelPack[i] = (int)Char.GetNumericValue(paksCharArrey[i]);
+                levelPack[i] = (int)Char.GetNumericValue(packCharArrey[i]);
             }
             return levelPack;
         }

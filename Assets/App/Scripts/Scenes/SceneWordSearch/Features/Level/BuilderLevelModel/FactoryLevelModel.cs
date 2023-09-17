@@ -25,72 +25,47 @@ namespace App.Scripts.Scenes.SceneWordSearch.Features.Level.BuilderLevelModel
 
         private List<char> BuildListChars(List<string> words)
         {
-            List<char> charsList = new List<char>();
-            List<char> charsList1 = new List<char>();
-            List<char> charsList2 = new List<char>();
-            List<char> charsListTemp = new List<char>();
-            List<char> charsList3 = new List<char>();
-            charsList = words[0].ToList();
-            charsList1 = words[0].ToList();
-            charsList2 = words[1].ToList();
-            charsList3 = words[2].ToList();
+            List<char> fullCharsList = words[0].ToList();
 
-            for (int i = 0; i < charsList2.Count; i++) //Find All extra lit
+            List<char> charsList0 = words[0].ToList();
+
+            List<char> charsList1 = words[1].ToList();
+
+            List<char> charsList2 = words[2].ToList();   
+
+            for (int i = 0; i < charsList1.Count; i++) 
             {
-                if (charsList1.Contains(charsList2[i]))
+                if (charsList0.Contains(charsList1[i]))
                 {
-                    charsList1.Remove(charsList2[i]);
+                    charsList0.Remove(charsList1[i]);
+                    charsList1.Remove(charsList1[i]);
+                    --i;
+                }
+                else
+                {
+                    fullCharsList.Add(charsList1[i]);
+                }
+            }
+
+            char[] tempCharArrey = fullCharsList.ToArray();
+            string tempString = new string(tempCharArrey);
+
+            List<char> tempCharsList = tempString.ToList();
+
+            for (int i = 0; i < charsList2.Count; i++)
+            {
+                if (tempCharsList.Contains(charsList2[i]))
+                {
+                    tempCharsList.Remove(charsList2[i]);
                     charsList2.Remove(charsList2[i]);
                     --i;
                 }
                 else
                 {
-                    charsList.Add(charsList2[i]);
+                    fullCharsList.Add(charsList2[i]);
                 }
             }
-            char[] temp = charsList.ToArray();
-            string txt = new string(temp);
-            Debug.Log(txt);
-            charsListTemp = txt.ToList();
-
-            for (int i = 0; i < charsList3.Count; i++)
-            {
-                if (charsListTemp.Contains(charsList3[i]))
-                {
-                    charsListTemp.Remove(charsList3[i]);
-                    charsList3.Remove(charsList3[i]);
-                    --i;
-                }
-                else
-                {
-                    charsList.Add(charsList3[i]);
-                }
-            }
-            char[] temp4 = charsList.ToArray();
-            string txt4 = new string(temp4);
-            Debug.Log(txt4);
-            return charsList;
-
-
-
-
-
-
-
-            //for (int i = 1; i < words.Count; i++)
-            //{
-            //    for (int j = 0; j < words[i].Length; j++)
-            //    {
-            //        if (!charsList.Contains(words[i][j]))
-            //        {
-            //            charsList.Add(words[i][j]);
-            //        }
-
-            //    }
-            //}
-
-            //напиши реализацию не меняя сигнатуру функции
-            //throw new NotImplementedException();
+            return fullCharsList;
         }
     }
 }

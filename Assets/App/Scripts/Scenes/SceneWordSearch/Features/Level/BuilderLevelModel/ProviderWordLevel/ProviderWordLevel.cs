@@ -27,8 +27,6 @@ namespace App.Scripts.Scenes.SceneWordSearch.Features.Level.BuilderLevelModel.Pr
                     LevelInfo level = JsonUtility.FromJson<LevelInfo>(textAssetLevel.text);
                     return level;
             }
-            //напиши реализацию не меняя сигнатуру функции
-            throw new NotImplementedException();
         }
     }
 }
