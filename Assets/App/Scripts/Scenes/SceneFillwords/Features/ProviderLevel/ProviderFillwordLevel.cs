@@ -20,7 +20,12 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
 
 
             int[] levelPack = LoadLevel(index, packs);
-            char[] lettersOfIndexWord = LoadWord(index, wordsList);            
+            char[] lettersOfIndexWord = LoadWord(index, wordsList);
+
+            if(levelPack is null)
+            {
+                levelPack = LoadLevel(index + 1, packs);
+            }
 
             if (levelPack.Length < 4)
             {
@@ -34,25 +39,27 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
 
             if (levelPack.Length == 4 && lettersOfIndexWord.Length == 4)
             {
-                Vector2Int size = new Vector2Int(2, 2);
-
-                FillSquare(levelPack, lettersOfIndexWord, size);
+                Vector2Int size = new Vector2Int(2, 2);       
 
                 GridFillWords gridFillWords = FillSquare(levelPack, lettersOfIndexWord, size);
                 return gridFillWords;
+            }
+
+            if(levelPack.Length == 9 && lettersOfIndexWord.Length != 9)
+            {
+                int numberOfSimpleLevels = 7;
+                int indexLongWord = index - numberOfSimpleLevels;
+                lettersOfIndexWord = LoadLongWord(indexLongWord, wordsList);
             }
 
             if(levelPack.Length == 9 && lettersOfIndexWord.Length == 9)
             {
                 Vector2Int size = new Vector2Int(3, 3);
-                FillSquare(levelPack, lettersOfIndexWord, size);
 
                 GridFillWords gridFillWords = FillSquare(levelPack, lettersOfIndexWord, size);
                 return gridFillWords;
             }
-
-            return null;
-      
+            return null;      
         }
 
         public GridFillWords FillSquare(int[] levelPack, char[] lettersOfIndexWord, Vector2Int size)
@@ -74,43 +81,42 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
 
         public int[] LoadLevel(int index, string[] packs)
         {
-            Debug.Log("start metod  " + packs[index].Length);
-            //if (index > 9)
-            //{
-            //    throw new Exception();
-            //}
+            if (index > 9)
+            {
+                throw new Exception();
+            }
 
             if (packs[index].Length <= 10)
             {
-                Debug.Log("tyt");
-                packs[index] = packs[index].Replace(";", "");
-                packs[index] = packs[index].Remove(0, 2);
+                packs[index] = packs[index].Replace(";", "").Remove(0, 2);
                 char[] paksCharArrey = packs[index].TrimEnd().ToArray();
                 int[] levelPack = CharsInInts(paksCharArrey);
                 return levelPack;
             }
             else if (packs[index].Length > 10 && packs[index].Length <= 27)
             {
-                Debug.Log("hi");
                 StringBuilder stringBuilder = new StringBuilder();
                 packs[index] = packs[index].Replace(";", "");
                 string[] splitStrigs = packs[index].Split(new string[] { " " }, StringSplitOptions.None);
                 for (int i = 0; i < splitStrigs.Length; i++)
                 {
-                    if(splitStrigs[i].Length > 4)
+                    if (splitStrigs[i].Length > 2)
                     {
+                        if(i == splitStrigs.Length - 1)
+                        {
+                            _ = splitStrigs[i].TrimEnd();
+                        }
                         stringBuilder.Append(splitStrigs[i]);
                     }
                 }
-                Debug.Log(stringBuilder.ToString());
                 char[] paksCharArrey = stringBuilder.ToString().TrimEnd().ToArray();
                 int[] levelPack = CharsInInts(paksCharArrey);
                 return levelPack;
             }
             else
             {
-                Debug.Log("bad");
-                return null;
+                int[] levelPack = null;
+                return levelPack;
             }
         }
 
@@ -131,6 +137,21 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
             return lettersOfIndexWord;
         }
 
+        public char[] LoadLongWord(int indexLongWord, string[] wordsList)
+        {
+            string[] longWordsList = new string[wordsList.Length];
+            for (int i = 0, j = 0; i < wordsList.Length; i++)
+            {
+                if (wordsList[i].Length == 10)
+                {
+                    longWordsList[j] = wordsList[i];
+                    j++;
+                }
+            }
+            string tempString = longWordsList[indexLongWord].TrimEnd();
 
+            char[] lettersOfIndexWord = tempString.ToArray();
+            return lettersOfIndexWord;
+        }
     }
 }
