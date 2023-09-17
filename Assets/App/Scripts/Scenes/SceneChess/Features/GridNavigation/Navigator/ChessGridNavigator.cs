@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using App.Scripts.Scenes.SceneChess.Features.ChessField.GridMatrix;
 using App.Scripts.Scenes.SceneChess.Features.ChessField.Types;
 using UnityEngine;
-using App.Scripts.Scenes.SceneWordSearch.Features.Level.Models.Level;
 using App.Scripts.Scenes.SceneChess.Features.ChessField.Piece;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
-using System.Drawing;
+
 
 namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
 {
