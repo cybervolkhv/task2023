@@ -45,6 +45,8 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
             //{
             //    Debug.Log("works2");
             //}
+
+            Debug.Log(index + " -index");
             TextAsset textAsset = (TextAsset)Resources.Load("Fillwords/pack_0");
             string[] packs = textAsset.text.Split(new string[] { "\n" }, StringSplitOptions.None);
             packs[index] = packs[index].Replace(";", "");
@@ -53,8 +55,9 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
 
             TextAsset textAsset2 = (TextAsset)Resources.Load("Fillwords/words_list");
             string[] wordsList = textAsset2.text.Split(new string[] { "\n" }, StringSplitOptions.None);
-            char[] lettersOfIndexWord = wordsList[index].Replace(" ", "").ToArray();
-            //Debug.Log(lettersOfIndexWord.Length);
+            string tempString = wordsList[index].Replace(" ", "");
+            char[] lettersOfIndexWord = tempString.ToArray();
+            Debug.Log(lettersOfIndexWord.Length + "lettersOfIndexWord.Length");
 
 
 
@@ -64,7 +67,7 @@ namespace App.Scripts.Scenes.SceneFillwords.Features.ProviderLevel
             {
                 levelPack[i] = (int)Char.GetNumericValue(paksCharArrey[i]);
             }
-            Debug.Log(levelPack.Length);
+            Debug.Log(levelPack.Length + "levelPack.Length");
             if (levelPack.Length == 5)
             {
                 Vector2Int size = new Vector2Int(2, 2);
