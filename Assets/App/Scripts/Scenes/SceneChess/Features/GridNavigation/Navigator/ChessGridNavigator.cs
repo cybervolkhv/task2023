@@ -6,58 +6,61 @@ using UnityEngine;
 using App.Scripts.Scenes.SceneWordSearch.Features.Level.Models.Level;
 using App.Scripts.Scenes.SceneChess.Features.ChessField.Piece;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 
 namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
 {
     public class ChessGridNavigator : IChessGridNavigator
-    {
-
-
+    {     
         public List<Vector2Int> FindPath(ChessUnitType unit, Vector2Int from, Vector2Int to, ChessGrid grid)
         {
             List<Vector2Int> PathToTarget = new List<Vector2Int>();
-            List<Node> CheckedNodes = new List<Node>();
-            List<Node> WaitingNodes = new List<Node>();
+            List<Node> checkedNodes = new List<Node>();
+            List<Node> waitingNodes = new List<Node>();
             int startG = 0;
             if (from == to) { return PathToTarget; }
 
             Node startNode = new Node(startG, from, to, null);
-            CheckedNodes.Add(startNode);
-            switch (unit)
-            {
-                case ChessUnitType.King:
-                    WaitingNodes.AddRange(GetNeighborsForKing(startNode));
-                    break;
-                case ChessUnitType.Knight:
-                    WaitingNodes.AddRange(GetNeighborsForKnight(startNode));
-                    break;
-                case ChessUnitType.Pon:
-                    WaitingNodes.AddRange(GetNeighborsForPon(startNode));
-                    break;
-                case ChessUnitType.Queen:
-                    WaitingNodes.AddRange(GetNeighborsForQueen(startNode, grid));
-                    break;
-                case ChessUnitType.Bishop:
-                    WaitingNodes.AddRange(GetNeighborsForBishop(startNode, grid));
-                    break;
-                case ChessUnitType.Rook:
-                    WaitingNodes.AddRange(GetNeighborsForRook(startNode, grid));
-                    break;
-            }
+            checkedNodes.Add(startNode);
 
-            while (WaitingNodes.Count > 0)
+            GetNeighbors(unit, startNode, grid, waitingNodes);
+            //switch (unit)
+            //{
+            //    case ChessUnitType.King:
+            //        WaitingNodes.AddRange(GetNeighborsForKing(startNode));
+            //        break;
+            //    case ChessUnitType.Knight:
+            //        WaitingNodes.AddRange(GetNeighborsForKnight(startNode));
+            //        break;
+            //    case ChessUnitType.Pon:
+            //        WaitingNodes.AddRange(GetNeighborsForPon(startNode));
+            //        break;
+            //    case ChessUnitType.Queen:
+            //        WaitingNodes.AddRange(GetNeighborsForQueen(startNode, grid));
+            //        break;
+            //    case ChessUnitType.Bishop:
+            //        WaitingNodes.AddRange(GetNeighborsForBishop(startNode, grid));
+            //        break;
+            //    case ChessUnitType.Rook:
+            //        WaitingNodes.AddRange(GetNeighborsForRook(startNode, grid));
+            //        break;
+            //}
+
+            while (waitingNodes.Count > 0)
             {
                 //Node nodeToCheck = WaitingNodes.Where(x => x.F == WaitingNodes.Min(y => y.F)).FirstOrDefault();
-                int minValueF = int.MaxValue;
-                Node nodeToCheck = null;
-                foreach (Node node in WaitingNodes)
-                {
-                    if (node.F < minValueF)
-                    {
-                        minValueF = node.F;
-                        nodeToCheck = node;
-                    }
-                }
+
+                //int minValueF = int.MaxValue;
+                //Node nodeToCheck = null;
+                //foreach (Node node in waitingNodes)
+                //{
+                //    if (node.F < minValueF)
+                //    {
+                //        minValueF = node.F;
+                //        nodeToCheck = node;
+                //    }
+                //}
+                Node nodeToCheck = SelectNodeWithMinFCost(waitingNodes);
 
                 if (nodeToCheck.Position == to)
                 {
@@ -65,50 +68,51 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
                 }
 
                 ChessUnit chessUnit = grid.Get(nodeToCheck.Position);
-                bool walkable = chessUnit == null;
+                bool isAvailable = chessUnit == null;
 
-                if (!walkable)
+                if (!isAvailable)
                 {
-                    WaitingNodes.Remove(nodeToCheck);
-                    CheckedNodes.Add(nodeToCheck);
+                    waitingNodes.Remove(nodeToCheck);
+                    checkedNodes.Add(nodeToCheck);
                 }
-                else if (walkable)
+                else if (isAvailable)
                 {
-                    WaitingNodes.Remove(nodeToCheck);
+                    waitingNodes.Remove(nodeToCheck);
 
-                    bool isContains = false;
-                    foreach (Node node in CheckedNodes)
-                    {
-                        if (node.Position == nodeToCheck.Position)
-                        {
-                            isContains = true;
-                        }
-                    }
+                    bool isContains = IsContains(nodeToCheck, checkedNodes);
+                    //foreach (Node node in checkedNodes)
+                    //{
+                    //    if (node.Position == nodeToCheck.Position)
+                    //    {
+                    //        isContains = true;
+                    //    }
+                    //}
 
                     if (!isContains)        //((!CheckedNodes.Where(x => x.Position == nodeToCheck.Position).Any())) // если нету то добавь(!CheckedNodes.Contains(nodeToCheck)) 
                     {
-                        CheckedNodes.Add(nodeToCheck);
-                        switch (unit)
-                        {
-                            case ChessUnitType.King:
-                                WaitingNodes.AddRange(GetNeighborsForKing(nodeToCheck));
-                                break;
-                            case ChessUnitType.Knight:
-                                WaitingNodes.AddRange(GetNeighborsForKnight(nodeToCheck));
-                                break;
-                            case ChessUnitType.Pon:
-                                WaitingNodes.AddRange(GetNeighborsForPon(nodeToCheck));
-                                break;
-                            case ChessUnitType.Queen:
-                                WaitingNodes.AddRange(GetNeighborsForQueen(nodeToCheck, grid));
-                                break;
-                            case ChessUnitType.Bishop:
-                                WaitingNodes.AddRange(GetNeighborsForBishop(nodeToCheck, grid));
-                                break;
-                            case ChessUnitType.Rook:
-                               WaitingNodes.AddRange(GetNeighborsForRook(nodeToCheck, grid));
-                                break;
-                        }
+                        checkedNodes.Add(nodeToCheck);
+                        GetNeighbors(unit, nodeToCheck, grid, waitingNodes);
+                        //switch (unit)
+                        //{
+                        //    case ChessUnitType.King:
+                        //        waitingNodes.AddRange(GetNeighborsForKing(nodeToCheck));
+                        //        break;
+                        //    case ChessUnitType.Knight:
+                        //        waitingNodes.AddRange(GetNeighborsForKnight(nodeToCheck));
+                        //        break;
+                        //    case ChessUnitType.Pon:
+                        //        waitingNodes.AddRange(GetNeighborsForPon(nodeToCheck));
+                        //        break;
+                        //    case ChessUnitType.Queen:
+                        //        waitingNodes.AddRange(GetNeighborsForQueen(nodeToCheck, grid));
+                        //        break;
+                        //    case ChessUnitType.Bishop:
+                        //        waitingNodes.AddRange(GetNeighborsForBishop(nodeToCheck, grid));
+                        //        break;
+                        //    case ChessUnitType.Rook:
+                        //       waitingNodes.AddRange(GetNeighborsForRook(nodeToCheck, grid));
+                        //        break;
+                        //}
                     }
                 }
 
@@ -118,6 +122,47 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             //напиши реализацию не меняя сигнатуру функции
             //throw new NotImplementedException();
         }
+
+        public void GetNeighbors(ChessUnitType unit, Node node, ChessGrid grid, List<Node> waitingNodes)
+        {
+            switch (unit)
+            {
+                case ChessUnitType.King:
+                    waitingNodes.AddRange(GetNeighborsForKing(node));
+                    break;
+                case ChessUnitType.Knight:
+                    waitingNodes.AddRange(GetNeighborsForKnight(node));
+                    break;
+                case ChessUnitType.Pon:
+                    waitingNodes.AddRange(GetNeighborsForPon(node));
+                    break;
+                case ChessUnitType.Queen:
+                    waitingNodes.AddRange(GetNeighborsForQueen(node, grid));
+                    break;
+                case ChessUnitType.Bishop:
+                    waitingNodes.AddRange(GetNeighborsForBishop(node, grid));
+                    break;
+                case ChessUnitType.Rook:
+                    waitingNodes.AddRange(GetNeighborsForRook(node, grid));
+                    break;
+            }
+        }
+
+        public Node SelectNodeWithMinFCost(List<Node> waitingNodes)
+        {
+            int minValueF = int.MaxValue;
+            Node nodeToCheck = null;
+            foreach (Node node in waitingNodes)
+            {
+                if (node.F < minValueF)
+                {
+                    minValueF = node.F;
+                    nodeToCheck = node;
+                }
+            }
+            return nodeToCheck;
+        }
+
 
         public List<Vector2Int> CalculatePathFromNode(Node node)
         {
@@ -131,6 +176,19 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             }
             path.Reverse();
             return path;
+        }
+
+        public bool IsContains(Node nodeToCheck, List<Node> checkedNodes)
+        {
+            bool isContains = false;
+            foreach (Node node in checkedNodes)
+            {
+                if (node.Position == nodeToCheck.Position)
+                {
+                    isContains = true;
+                }
+            }
+            return isContains;
         }
 
         public List<Node> GetNeighborsForKing(Node node)
@@ -614,26 +672,5 @@ namespace App.Scripts.Scenes.SceneChess.Features.GridNavigation.Navigator
             return neighbors;
         }
 
-
-    }
-
-    public class Node
-    {
-        public Vector2Int Position;
-        public Vector2Int TargetPosition;
-        public Node PreviosNode;
-        public int F;
-        public int G;
-        public int H;
-
-        public Node(int g, Vector2Int nodePosition, Vector2Int targetPosition, Node previosNod)
-        {
-            Position = nodePosition;
-            TargetPosition = targetPosition;
-            PreviosNode = previosNod;
-            G = g;
-            H = Math.Abs(targetPosition.x - Position.x) + Math.Abs(targetPosition.y - Position.y);
-            F = G + H;
-        }
     }
 }
